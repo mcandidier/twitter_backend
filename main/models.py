@@ -26,10 +26,16 @@ class Tweet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.CharField(max_length=280)
     created_at = models.DateTimeField(auto_now_add=True)
-    likes = models.ManyToManyField(User, related_name='liked_tweets')
+    likes = models.ManyToManyField(User, through='Like', related_name='liked_posts')
 
     def __str__(self):
         return f'{self.content}-{self.user.username}'
+    
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

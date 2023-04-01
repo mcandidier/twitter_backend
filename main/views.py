@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from rest_framework import viewsets
-from .models import Profile, Tweet, Comment, Following
+from .models import Profile, Tweet, Comment, Following, Like
 from .serializers import ProfileSerializer, TweetSerializer, CommentSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -52,13 +52,16 @@ class TweetViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True, url_path='likes')
     def likes(self, request, pk=None):
         instance = self.get_object()
-        instance.likes.add(self.request.user)
+        Like.objects.create(user=self.request.user, tweet=instance)
         return Response({'msg': 'success'}, status=200)
 
-    @action(methods=['delete'], detail=True, url_path='likes')
+    @action(methods=['delete'], detail=True, url_path='unlike')
     def unlike(self, request, pk=None):
         instance = self.get_object()
-        instance.likes.delete(self.request.user)
+        try:
+            instance.likes.delete(self.request.user)
+        except Exception as e:
+            print(e)
         return Response({'msg': 'success'}, status=200)
 
 

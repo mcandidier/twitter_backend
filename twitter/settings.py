@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     #internal applications
     'main.apps.MainConfig',
+    'notification.apps.NotificationConfig'
 ]
 
 MIDDLEWARE = [
