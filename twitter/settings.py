@@ -36,12 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_registration',
-
-
+    'channels',
     #internal applications
     'main.apps.MainConfig',
     'notification.apps.NotificationConfig'
@@ -75,7 +75,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'twitter.wsgi.application'
+# WSGI_APPLICATION = 'twitter.wsgi.application'
+
+ASGI_APPLICATION = 'twitter.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # Database
