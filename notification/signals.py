@@ -2,12 +2,20 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from main.models import Like, Following, Comment
+from main.models import Profile
+from django.contrib.auth.models import User
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 from .models import Notification
+from main.models import Like, Following, Comment
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
 
 def create_notification(user, message, action_user, content_type, object_id):

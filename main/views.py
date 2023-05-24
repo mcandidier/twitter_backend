@@ -5,6 +5,7 @@ from .models import Profile, Tweet, Comment, Following, Like
 from .serializers import ProfileSerializer, TweetSerializer, CommentSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -33,7 +34,31 @@ class ProfileViewSet(viewsets.ModelViewSet):
         except Exception as exc:
             return Response({'msg': exc}, status=400)
         return Response({'msg': msg}, status=200)
-      
+    
+
+class UserProfileViewSet(viewsets.ViewSet):
+    serializer_class = ProfileSerializer
+    
+    def retrieve(self, *args, **kwargs):
+        try:
+            user_id = kwargs.get('id')
+            obj = Profile.objects.get(user__id=user_id)
+            serializer = self.serializer_class(obj)
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            return Response({'msg': 'object not found'}, status=400)
+        
+    def update_profile(self, *args, **kwargs):
+        print(self.request.data, 'update profile')
+        try:
+            user_profile = Profile.objects.get(user=self.request.user)
+            serializer = self.serializer_class(user_profile, data=self.request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=self.request.user)
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            raise NotF
+
 
 class TweetViewSet(viewsets.ModelViewSet):
     queryset = Tweet.objects.all()

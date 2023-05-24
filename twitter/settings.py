@@ -42,12 +42,14 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_registration',
     'channels',
+    'corsheaders',
     #internal applications
     'main.apps.MainConfig',
     'notification.apps.NotificationConfig'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,10 +148,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'main.auth.BearerAuthentication',
     ],
 }
@@ -158,3 +161,8 @@ REST_FRAMEWORK = {
 AUTHENTICATION_BACKENDS = [
     'drf_registration.auth.MultiFieldsModelBackend',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+
