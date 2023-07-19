@@ -1,11 +1,22 @@
+import os
 from django.shortcuts import render
 
 from rest_framework import viewsets
-from .models import Profile, Tweet, Comment, Following, Like
-from .serializers import ProfileSerializer, TweetSerializer, CommentSerializer
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.storage import default_storage
+
+
+from .serializers import (
+    ProfileSerializer, 
+    TweetSerializer, 
+    CommentSerializer,
+    UserImageSerializer,
+    )
+from .models import Profile, Tweet, Comment, Following, Like
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -39,7 +50,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class UserProfileViewSet(viewsets.ViewSet):
     serializer_class = ProfileSerializer
     
-    def retrieve(self, *args, **kwargs):
+    def retrieve(self, *args, **kwargs): 
         try:
             user_id = kwargs.get('id')
             obj = Profile.objects.get(user__id=user_id)
@@ -49,7 +60,6 @@ class UserProfileViewSet(viewsets.ViewSet):
             return Response({'msg': 'object not found'}, status=400)
         
     def update_profile(self, *args, **kwargs):
-        print(self.request.data, 'update profile')
         try:
             user_profile = Profile.objects.get(user=self.request.user)
             serializer = self.serializer_class(user_profile, data=self.request.data)
@@ -57,7 +67,7 @@ class UserProfileViewSet(viewsets.ViewSet):
             serializer.save(user=self.request.user)
             return Response(serializer.data, status=200)
         except Exception as e:
-            raise NotF
+            return Response({'msg': 'object not found'}, status=400)
 
 
 class TweetViewSet(viewsets.ModelViewSet):
@@ -102,9 +112,25 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = serializer.save(user=self.request.user)
         return super().perform_create(serializer)
 
+
 class FollowViewSet(viewsets.ViewSet):
 
     def follow(self, *args, **kwargs):
         pass
+
+
+class UserUploadImageView(APIView):
+    """Upload user profile image
+    """
+    parser_classes = (MultiPartParser,)
+    
+    def put(self, format=None):
+        profile = self.request.user.profile
+        serializer  = UserImageSerializer(profile, data=self.request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
 
 
