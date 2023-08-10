@@ -2,3 +2,5 @@
 *.sqlite3
 venv/
 
+media/
+dump.rdb

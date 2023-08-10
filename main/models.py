@@ -32,6 +32,9 @@ class Tweet(models.Model):
     def __str__(self):
         return f'{self.content}-{self.user.username}'
     
+    class Meta:
+        ordering = ['-created_at']
+
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)

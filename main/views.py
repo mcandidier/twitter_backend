@@ -46,6 +46,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Response({'msg': exc}, status=400)
         return Response({'msg': msg}, status=200)
     
+class ProfileView(APIView):
+    # Returns request user profile
+    serializer_class = ProfileSerializer
+
+    def get(self, *args, **kwargs):
+        profile = self.request.user.profile
+        serializer = self.serializer_class(profile)
+        return Response(serializer.data, status=200)
+
 
 class UserProfileViewSet(viewsets.ViewSet):
     serializer_class = ProfileSerializer
@@ -74,9 +83,24 @@ class TweetViewSet(viewsets.ModelViewSet):
     queryset = Tweet.objects.all()
     serializer_class = TweetSerializer
 
+    def get_queryset(self, *args, **kwargs):
+        user_id = kwargs.get('id')
+        if user_id is not None:
+            self.queryset = Tweet.objects.filter(user__id=user_id)
+        return super().get_queryset()
+
     def perform_create(self, serializer):
         serializer = serializer.save(user=self.request.user)
         return super().perform_create(serializer)
+
+
+    @action(methods=['get'], detail=True, url_path='user')
+    def user_tweets(self, request, pk=None):
+        if pk is not None:
+            queryset = Tweet.objects.filter(user__id=pk)
+            serializer = self.serializer_class(queryset, many=True)
+            return Response(serializer.data, status=200)
+        return Response({'msg': 'user not found'}, status=400)
 
     @action(methods=['get'], detail=True)
     def comments(self, request, pk=None):
@@ -88,16 +112,16 @@ class TweetViewSet(viewsets.ModelViewSet):
     def likes(self, request, pk=None):
         instance = self.get_object()
         Like.objects.create(user=self.request.user, tweet=instance)
-        return Response({'msg': 'success'}, status=200)
+        return Response({'msg': 'success', 'user': self.request.user.id}, status=200)
 
     @action(methods=['delete'], detail=True, url_path='unlike')
     def unlike(self, request, pk=None):
         instance = self.get_object()
         try:
-            instance.likes.delete(self.request.user)
+            instance.likes.remove(self.request.user)
         except Exception as e:
             print(e)
-        return Response({'msg': 'success'}, status=200)
+        return Response({'msg': 'success', 'user': self.request.user.id}, status=200)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

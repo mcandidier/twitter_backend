@@ -9,8 +9,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['user', 'bio', 'location', 'birth_date', 'followers', 'following', 'username']
+        fields = ['user', 'bio', 'location', 'birth_date', 'followers', 'following', 'username', 'avatar',]
         read_only_fields = ('followers', 'following', 'user',)
+
 
     def get_username(self, obj):
        return obj.user.username
@@ -20,15 +21,24 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_following(self, obj):
         return obj.user.following.all().count()
+    
+
+
+
 
 class TweetSerializer(serializers.ModelSerializer):
     
+    username = serializers.SerializerMethodField()
+
     class Meta:
         model = Tweet
-        fields = ['id', 'user', 'content', 'created_at', 'likes']
+        fields = ['id', 'user', 'content', 'created_at', 'likes', 'username'
+        ]
         read_only_fields = ('likes', 'user',)
 
-
+    def get_username(self, obj):
+        return obj.user.username
+    
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
