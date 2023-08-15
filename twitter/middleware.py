@@ -9,14 +9,17 @@ from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-@database_sync_to_async
-def get_user(token):
-    try:
-        token = Token.objects.get(key=token)
-        return token.user
-    except User.DoesNotExist:
-        return AnonymousUser()
 
+@database_sync_to_async
+def authenticate_user(query_string):
+    token = query_string.decode('utf-8').split('=')[1]
+    try:
+        token_obj = Token.objects.get(key=token)
+        user = token_obj.user
+        return user
+    except Token.DoesNotExist:
+        return AnonymousUser()
+    
 
 class TokenAuthMiddleware:
     """
@@ -31,7 +34,7 @@ class TokenAuthMiddleware:
         # Look up user from query string (you should also do things like
         # checking if it is a valid user ID, or if scope["user"] is already
         # populated).
-        headers = {key.decode(): value.decode() for key, value in scope['headers']}
-        scope['user'] = await get_user(headers['authorization'])
+
+        scope['user'] = await authenticate_user(scope.get('query_string'))
         return await self.app(scope, receive, send)
 
