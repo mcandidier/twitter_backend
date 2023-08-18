@@ -72,13 +72,14 @@ def send_notification(sender, instance, created, **kwargs):
         # send notification thru channel layer group
         # get channel layer then send the message 
         # @room_name_format: 'user-{instance.user.id}'
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f'user_{instance.user.id}',
-            {
-                'type': 'send_notification',
-                'message': instance.message
-            }
-        )
+        if instance.action_user != instance.user:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'user_{instance.user.id}',
+                {
+                    'type': 'send_notification',
+                    'message': instance.message
+                }
+            )
         
          
