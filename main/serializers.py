@@ -46,7 +46,6 @@ class TweetSerializer(serializers.ModelSerializer):
     def get_username(self, obj):
         return obj.user.username
     
-
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment

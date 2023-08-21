@@ -1,3 +1,5 @@
+import json
+
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
@@ -74,11 +76,16 @@ def send_notification(sender, instance, created, **kwargs):
         # @room_name_format: 'user-{instance.user.id}'
         if instance.action_user != instance.user:
             channel_layer = get_channel_layer()
+
+            data = {
+                'message': instance.message,
+                'user': instance.action_user.id
+            }
             async_to_sync(channel_layer.group_send)(
                 f'user_{instance.user.id}',
                 {
                     'type': 'send_notification',
-                    'message': instance.message
+                    'message': json.dumps(data)
                 }
             )
         

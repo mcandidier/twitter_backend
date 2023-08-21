@@ -46,6 +46,20 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Response({'msg': exc}, status=400)
         return Response({'msg': msg}, status=200)
     
+    @action(methods=['delete'], detail=True)
+    def unfollow(self, request, pk=None):
+        instance = self.get_object()
+        obj = Following.objects.filter(
+            user=self.request.user,
+            following=instance.user)
+        if obj.exists():
+            obj.first().delete()
+            return Response(status=200)
+        return Response(status=400)
+    
+    
+
+    
 class ProfileView(APIView):
     # Returns request user profile
     serializer_class = ProfileSerializer
