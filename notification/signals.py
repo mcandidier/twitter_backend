@@ -70,16 +70,15 @@ def create_comment_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Notification)
 def send_notification(sender, instance, created, **kwargs):
     if created:
-        pass
         # send notification thru channel layer group
         # get channel layer then send the message 
         # @room_name_format: 'user-{instance.user.id}'
         if instance.action_user != instance.user:
             channel_layer = get_channel_layer()
-
             data = {
                 'message': instance.message,
-                'user': instance.action_user.id
+                'user': instance.action_user.id,
+                'created_at': instance.created_at.strftime("%m/%d/%Y, %H:%M:%S"),
             }
             async_to_sync(channel_layer.group_send)(
                 f'user_{instance.user.id}',
