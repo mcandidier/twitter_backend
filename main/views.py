@@ -190,5 +190,5 @@ class UsersToFollowView(APIView):
         followed_users = self.request.user.following.all().values_list('following_id', flat=True)
         followed_users = [x for x in followed_users]
         followed_users.append(self.request.user.id)
-        users_not_following = User.objects.exclude(id__in=followed_users)
+        users_not_following = User.objects.exclude(id__in=followed_users).order_by('?')[:10]
         return users_not_following
