@@ -1,5 +1,5 @@
 import os
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -9,6 +9,10 @@ from rest_framework.exceptions import NotFound
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 
+from drf_registration.api.user import UserSerializer
+from rest_framework.permissions import IsAuthenticated
+
+from django.contrib.auth.models import User
 
 from .serializers import (
     ProfileSerializer, 
@@ -56,7 +60,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
             obj.first().delete()
             return Response(status=200)
         return Response(status=400)
-    
     
 
     
@@ -147,6 +150,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # form data: tweet_id, content
+        # tweet = get_object_or_404(Tweet, id=self.request.data.get('tweet_id'))
         serializer = serializer.save(user=self.request.user)
         return super().perform_create(serializer)
 
@@ -170,5 +174,21 @@ class UserUploadImageView(APIView):
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
+from django.db.models import OuterRef, Subquery
 
 
+class UsersToFollowView(APIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, *args, **kwargs):
+        users_to_follow = self._users_not_followings(self.request.user)
+        serializer = self.serializer_class(users_to_follow, many=True)
+        return Response(serializer.data, status=200)
+
+    def _users_not_followings(self, user):
+        followed_users = self.request.user.following.all().values_list('following_id', flat=True)
+        followed_users = [x for x in followed_users]
+        followed_users.append(self.request.user.id)
+        users_not_following = User.objects.exclude(id__in=followed_users)
+        return users_not_following

@@ -47,10 +47,17 @@ class TweetSerializer(serializers.ModelSerializer):
         return obj.user.username
     
 class CommentSerializer(serializers.ModelSerializer):
+
+    username = serializers.SerializerMethodField()
+
+    
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'tweet', 'content', 'created_at']
-        read_only_fields = ('user',)
+        fields = ['id', 'user', 'tweet', 'content', 'created_at', 'username']
+        read_only_fields = ('user', 'username',)
+
+    def get_username(self, obj):
+        return obj.user.username
 
 
 class UserImageSerializer(serializers.ModelSerializer):

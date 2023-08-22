@@ -5,6 +5,7 @@ from .views import (
     CommentViewSet, UserProfileViewSet, 
     UserUploadImageView,
     ProfileView,
+    UsersToFollowView
 )
 
 
@@ -18,6 +19,6 @@ urlpatterns = [
     path('profiles/', ProfileView.as_view(), name='current-user-profile'),
     path('profile/', UserProfileViewSet.as_view({'put': 'update_profile'})),
     path('profile/image/', UserUploadImageView.as_view(), name='user-profile-image'),
-    # path('users/<int:id>/tweets/', TweetViewSet.as_view({'get': 'retrieve'})),
+    path('suggested/', UsersToFollowView.as_view()),
     path('', include(router.urls)), 
 ]
