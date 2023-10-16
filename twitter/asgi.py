@@ -3,22 +3,30 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from twitter.middleware import TokenAuthMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
+from channels.security.websocket import AllowedHostsOriginValidator
 
+# from django.contrib.sessions.middleware import SessionMiddleware
 
-from notification.urls import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'twitter.settings')
-
-
 django_asgi_app = get_asgi_application()
+
+from django.urls import re_path
+from notification import consumers
+from notification.urls import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": TokenAuthMiddleware(
+    "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
-            URLRouter(websocket_urlpatterns),
+            URLRouter(websocket_urlpatterns)
         )
-    )
+    ),
 })
+
+
+# "websocket": TokenAuthMiddleware(
+#     AuthMiddlewareStack(
+#         URLRouter(websocket_urlpatterns),
+#     )
+# )
