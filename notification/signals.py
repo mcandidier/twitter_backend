@@ -1,17 +1,24 @@
 import json
-
-
+import pusher
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from main.models import Profile
 from django.contrib.auth.models import User
-
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
+from django.conf import settings
+# from channels.layers import get_channel_layer
+# from asgiref.sync import async_to_sync
 from .models import Notification
 from main.models import Like, Following, Comment
+
+
+pusher_client = pusher.Pusher(
+    app_id=settings.PUSHER_ID,
+    key=settings.PUSHER_KEY,
+    secret=settings.PUSHER_SECRET,
+    cluster=settings.PUSHER_CLUSTER,
+    ssl=True
+)
 
 
 @receiver(post_save, sender=User)
@@ -69,23 +76,26 @@ def create_comment_notification(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Notification)
 def send_notification(sender, instance, created, **kwargs):
+
     if created:
         # send notification thru channel layer group
         # get channel layer then send the message 
         # @room_name_format: 'user-{instance.user.id}'
         if instance.action_user != instance.user:
-            channel_layer = get_channel_layer()
+            # channel_layer = get_channel_layer()
+            #disable channels and move to using PUSHER
+            # async_to_sync(channel_layer.group_send)(
+            #     f'user_{instance.user.id}',
+            #     {
+            #         'type': 'send_notification',
+            #         'message': json.dumps(data)
+            #     }
+            # )
+            
             data = {
                 'message': instance.message,
                 'user': instance.action_user.id,
                 'created_at': instance.created_at.strftime("%m/%d/%Y, %H:%M:%S"),
             }
-            async_to_sync(channel_layer.group_send)(
-                f'user_{instance.user.id}',
-                {
-                    'type': 'send_notification',
-                    'message': json.dumps(data)
-                }
-            )
-        
-         
+            channel_name = f'channel-{instance.user.auth_token.key}'
+            pusher_client.trigger(channel_name, 'new:notification', data)

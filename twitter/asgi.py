@@ -7,7 +7,6 @@ from channels.security.websocket import AllowedHostsOriginValidator
 
 # from django.contrib.sessions.middleware import SessionMiddleware
 
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'twitter.settings')
 django_asgi_app = get_asgi_application()
 

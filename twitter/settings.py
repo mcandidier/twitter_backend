@@ -20,7 +20,7 @@ env = environ.Env(
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -36,7 +36,6 @@ ALLOWED_HOSTS = ['localhost', '.vercel.app']
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +81,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'twitter.asgi.application'
+WSGI_APPLICATION = 'twitter.wsgi.application'
 
 
 CHANNEL_LAYERS = {
@@ -178,6 +177,12 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+PUSHER_ID=env('APP_ID')
+PUSHER_KEY=env('KEY')
+PUSHER_SECRET=env('SECRET')
+PUSHER_CLUSTER=env('CLUSTER')
+
 
 try:
     from local_settings import *
