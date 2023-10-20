@@ -24,9 +24,4 @@ application = ProtocolTypeRouter({
     ),
 })
 
-
-# "websocket": TokenAuthMiddleware(
-#     AuthMiddlewareStack(
-#         URLRouter(websocket_urlpatterns),
-#     )
-# )
+app = application
