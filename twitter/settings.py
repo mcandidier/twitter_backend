@@ -94,9 +94,7 @@ CHANNEL_LAYERS = {
             # 'USER': 'spadredis-zxs-service',
             # 'PASSWORD': '9zghygpri84f8vl',
             "hosts": [
-                env('REDIS')
-                # ("127.0.0.1", 6379),
-                # ('redis-18707.c9.us-east-1-4.ec2.cloud.redislabs.com', 18707)
+                ('redis-18707.c9.us-east-1-4.ec2.cloud.redislabs.com', 18707)
             ],
         },
     },
@@ -104,9 +102,7 @@ CHANNEL_LAYERS = {
 
 
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databasess
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
