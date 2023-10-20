@@ -82,8 +82,6 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'twitter.wsgi.application'
-
 ASGI_APPLICATION = 'twitter.asgi.application'
 
 
@@ -91,10 +89,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            # 'USER': 'spadredis-zxs-service',
-            # 'PASSWORD': '9zghygpri84f8vl',
             "hosts": [
-                ('redis-18707.c9.us-east-1-4.ec2.cloud.redislabs.com', 18707)
+                env('REDIS')
             ],
         },
     },
