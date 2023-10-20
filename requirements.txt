@@ -52,3 +52,6 @@ watchfiles==0.21.0
 websockets==11.0.3
 zope.interface==6.0
 psycopg2-binary==2.9.7
+charset
+channels==4.0.0
+channels-redis==4.1.0
