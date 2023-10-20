@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_registration',
-    'channels',
     'corsheaders',
     #internal applications
     'main',
@@ -84,16 +83,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'twitter.wsgi.application'
 
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [
-                env('REDIS')
-            ],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [
+#                 env('REDIS')
+#             ],
+#         },
+#     },
+# }
 
 
 # Database
