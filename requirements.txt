@@ -12,7 +12,7 @@ constantly==15.1.0
 cryptography==40.0.1
 Django==4.1.7
 django-cors-headers==3.14.0
-django-environ==0.11.2
+django-environ
 django-rest-framework==0.1.0
 djangorestframework==3.14.0
 drf-registration==0.1.3
