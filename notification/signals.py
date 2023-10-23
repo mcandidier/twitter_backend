@@ -96,6 +96,8 @@ def send_notification(sender, instance, created, **kwargs):
                 'message': instance.message,
                 'user': instance.action_user.id,
                 'created_at': instance.created_at.strftime("%m/%d/%Y, %H:%M:%S"),
+                'read': instance.read,
+                'id': instance.id,
             }
             channel_name = f'channel-{instance.user.auth_token.key}'
             pusher_client.trigger(channel_name, 'new:notification', data)

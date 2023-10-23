@@ -161,7 +161,8 @@ REST_FRAMEWORK = {
     # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'main.auth.BearerAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # <-- And here
+        # 'main.auth.BearerAuthentication',
     ],
 }
 
